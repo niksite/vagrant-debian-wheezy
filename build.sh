@@ -220,3 +220,4 @@ vagrant package --base "${BOX}"
 # http://blog.ericwhite.ca/articles/2009/11/unattended-debian-lenny-install/
 # http://docs-v1.vagrantup.com/v1/docs/base_boxes.html
 # http://www.debian.org/releases/stable/example-preseed.txt
+# https://mikegriffin.ie/blog/20130418-creating-a-debian-wheezy-base-box-for-vagrant/
