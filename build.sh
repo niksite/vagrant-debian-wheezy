@@ -43,7 +43,10 @@ mkdir -p "${FOLDER_ISO_INITRD}"
 
 ISO_FILENAME="${FOLDER_ISO}/`basename ${ISO_URL}`"
 INITRD_FILENAME="${FOLDER_ISO}/initrd.gz"
-ISO_GUESTADDITIONS="/Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso"
+
+ISO_GUESTADDITIONS_URL="http://download.virtualbox.org/virtualbox/4.2.8/VBoxGuestAdditions_4.2.8.iso"
+ISO_GUESTADDITIONS="${FOLDER_ISO}/VBoxGuestAdditions.iso"
+ISO_GUESTADDITIONS_MD5="9939fe5672f979e4153c8937619c24f3"
 
 # Setup vagrant locally
 
@@ -56,6 +59,18 @@ if [ ! -e "${ISO_FILENAME}" ]; then
   ISO_HASH=`md5sum "${ISO_FILENAME} | cut -c1-32"`
   if [ "${ISO_MD5}" != "${ISO_HASH}" ]; then
     echo "ERROR: MD5 does not match. Got ${ISO_HASH} instead of ${ISO_MD5}. Aborting."
+    exit 1
+  fi
+fi
+
+echo "Downloading `basename ${ISO_GUESTADDITIONS_URL}` ..."
+if [ ! -e "${ISO_GUESTADDITIONS}" ]; then
+  curl --output "${ISO_GUESTADDITIONS}" -L "${ISO_GUESTADDITIONS_URL}"
+
+  # make sure download is right...
+  ISO_GUESTADDITIONS_HASH=`md5sum "${ISO_GUESTADDITIONS} | cut -c1-32"`
+  if [ "${ISO_GUESTADDITIONS_MD5}" != "${ISO_GUESTADDITIONS_HASH}" ]; then
+    echo "ERROR: MD5 does not match. Got ${ISO_GUESTADDITIONS_HASH} instead of ${ISO_GUESTADDITIONS_MD5}. Aborting."
     exit 1
   fi
 fi
