@@ -2,7 +2,6 @@
 
 # make sure we have dependencies
 hash genisoimage 2>/dev/null || { echo >&2 "ERROR: genisoimage not found.  Aborting."; exit 1; }
-# FIXME use Gem to install vagrant
 hash bundle 2>/dev/null || { echo >&2 "ERROR: bundle not found.  Aborting."; exit 1; }
 hash VBoxManage 2>/dev/null || { echo >&2 "ERROR: VBoxManage not found.  Aborting."; exit 1; }
 hash 7z 2>/dev/null || { echo >&2 "ERROR: 7z not found.  Aborting."; exit 1; }
@@ -45,6 +44,8 @@ mkdir -p "${FOLDER_ISO_INITRD}"
 ISO_FILENAME="${FOLDER_ISO}/`basename ${ISO_URL}`"
 INITRD_FILENAME="${FOLDER_ISO}/initrd.gz"
 ISO_GUESTADDITIONS="/Applications/VirtualBox.app/Contents/MacOS/VBoxGuestAdditions.iso"
+
+# Setup vagrant locally
 
 # download the installation disk if you haven't already or it is corrupted somehow
 echo "Downloading `basename ${ISO_URL}` ..."
@@ -118,12 +119,16 @@ fi
 echo "Creating VM Box..."
 # create virtual machine
 if ! VBoxManage showvminfo "${BOX}" >/dev/null 2>/dev/null; then
+	
+  echo " * creating ..."
   VBoxManage createvm \
     --name "${BOX}" \
     --ostype Debian_64 \
     --register \
     --basefolder "${FOLDER_VBOX}"
 
+
+  echo " * configuring ..."
   VBoxManage modifyvm "${BOX}" \
     --memory 360 \
     --boot1 dvd \
@@ -134,12 +139,14 @@ if ! VBoxManage showvminfo "${BOX}" >/dev/null 2>/dev/null; then
     --pae off \
     --rtcuseutc on
 
+  echo " * configuring IDE ..."
   VBoxManage storagectl "${BOX}" \
     --name "IDE Controller" \
     --add ide \
     --controller PIIX4 \
     --hostiocache on
 
+  echo " * setting ISO image as boot disk ..."
   VBoxManage storageattach "${BOX}" \
     --storagectl "IDE Controller" \
     --port 1 \
@@ -147,6 +154,8 @@ if ! VBoxManage showvminfo "${BOX}" >/dev/null 2>/dev/null; then
     --type dvddrive \
     --medium "${FOLDER_ISO}/custom.iso"
 
+
+  echo " * configuring SATA ..."
   VBoxManage storagectl "${BOX}" \
     --name "SATA Controller" \
     --add sata \
@@ -154,10 +163,13 @@ if ! VBoxManage showvminfo "${BOX}" >/dev/null 2>/dev/null; then
     --sataportcount 1 \
     --hostiocache off
 
+  echo " * creating virtual disk ..."
   VBoxManage createhd \
     --filename "${FOLDER_VBOX}/${BOX}/${BOX}.vdi" \
     --size 40960
 
+
+  echo " * attaching virtual disk ..."
   VBoxManage storageattach "${BOX}" \
     --storagectl "SATA Controller" \
     --port 0 \
@@ -165,6 +177,7 @@ if ! VBoxManage showvminfo "${BOX}" >/dev/null 2>/dev/null; then
     --type hdd \
     --medium "${FOLDER_VBOX}/${BOX}/${BOX}.vdi"
 
+  echo -n "Running system installation ..."
   VBoxManage startvm "${BOX}"
 
   echo -n "Waiting for installer to finish "
@@ -189,9 +202,11 @@ if ! VBoxManage showvminfo "${BOX}" >/dev/null 2>/dev/null; then
   VBoxManage startvm "${BOX}"
 
   # get private key
+  echo "Install SSH private key"
   curl --output "${FOLDER_BUILD}/id_rsa" "https://raw.github.com/mitchellh/vagrant/master/keys/vagrant"
   chmod 600 "${FOLDER_BUILD}/id_rsa"
 
+  echo "Install virtualbox guest additions"
   # install virtualbox guest additions
   ssh -i "${FOLDER_BUILD}/id_rsa" -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p $GUESTSSH_PORT vagrant@127.0.0.1 "sudo mount /dev/cdrom /media/cdrom; sudo sh /media/cdrom/VBoxLinuxAdditions.run -- --force; sudo umount /media/cdrom; sudo shutdown -h now"
   echo -n "Waiting for machine to shut off "
