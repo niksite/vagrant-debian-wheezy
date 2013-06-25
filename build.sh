@@ -144,7 +144,7 @@ if ! VBoxManage showvminfo "${BOX}" >/dev/null 2>/dev/null; then
   echo " * creating ..."
   VBoxManage createvm \
     --name "${BOX}" \
-    --ostype Debian_64 \
+    --ostype Debian \
     --register \
     --basefolder "${FOLDER_VBOX}"
 
