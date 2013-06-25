@@ -1,18 +1,22 @@
 #!/bin/bash
 
 # make sure we have dependencies
-hash mkisofs 2>/dev/null || { echo >&2 "ERROR: mkisofs not found.  Aborting."; exit 1; }
-hash vagrant 2>/dev/null || { echo >&2 "ERROR: vagrant not found.  Aborting."; exit 1; }
+hash genisoimage 2>/dev/null || { echo >&2 "ERROR: genisoimage not found.  Aborting."; exit 1; }
+# FIXME use Gem to install vagrant
+hash bundle 2>/dev/null || { echo >&2 "ERROR: bundle not found.  Aborting."; exit 1; }
 hash VBoxManage 2>/dev/null || { echo >&2 "ERROR: VBoxManage not found.  Aborting."; exit 1; }
+hash 7z 2>/dev/null || { echo >&2 "ERROR: 7z not found.  Aborting."; exit 1; }
 
 set -o nounset
 set -o errexit
 #set -o xtrace
 
 # Configurations
-BOX="debian-wheezy-64"
-ISO_URL="http://cdimage.debian.org/debian-cd/7.0.0/amd64/iso-cd/debian-7.0.0-amd64-netinst.iso"
-ISO_MD5="6a55096340b5b1b7d335d5b559e13ea0"
+BOX="debian-wheezy-7_1-32"
+#ISO_URL="http://cdimage.debian.org/debian-cd/7.0.0/amd64/iso-cd/debian-7.0.0-i386-netinst.iso"
+#ISO_MD5="6a55096340b5b1b7d335d5b559e13ea0"
+ISO_URL="http://cdimage.debian.org/debian-cd/current/i386/iso-cd/debian-7.1.0-i386-netinst.iso"
+ISO_MD5="a70efb67ca061175eabe7c5dc04ab323"
 
 # location, location, location
 FOLDER_BASE=`pwd`
