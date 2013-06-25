@@ -198,8 +198,9 @@ if ! VBoxManage showvminfo "${BOX}" >/dev/null 2>/dev/null; then
     --type hdd \
     --medium "${FOLDER_VBOX}/${BOX}/${BOX}.vdi"
 
+
   echo -n "Running system installation ..."
-  VBoxManage startvm "${BOX}"
+  VBoxHeadless --startvm "${BOX}"
 
   echo -n "Waiting for installer to finish "
   while VBoxManage list runningvms | grep "${BOX}" >/dev/null; do
@@ -220,7 +221,7 @@ if ! VBoxManage showvminfo "${BOX}" >/dev/null 2>/dev/null; then
     --type dvddrive \
     --medium "${ISO_GUESTADDITIONS}"
 
-  VBoxManage startvm "${BOX}"
+  VBoxHeadless --startvm "${BOX}"
 
   # get private key
   echo "Install SSH private key"
