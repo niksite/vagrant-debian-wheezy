@@ -134,6 +134,12 @@ fi
 echo "Creating VM Box..."
 # create virtual machine
 if ! VBoxManage showvminfo "${BOX}" >/dev/null 2>/dev/null; then
+  echo " * remove previously created VM"
+  if VBoxManage list vms |grep -q "^\"${BOX}\"" ; then
+	  VBoxManage unregistervm \
+		"${BOX}" \
+		--delete
+  fi
 	
   echo " * creating ..."
   VBoxManage createvm \
