@@ -52,7 +52,7 @@ if [ ! -e "${ISO_FILENAME}" ]; then
   curl --output "${ISO_FILENAME}" -L "${ISO_URL}"
 
   # make sure download is right...
-  ISO_HASH=`md5 -q "${ISO_FILENAME}"`
+  ISO_HASH=`md5sum "${ISO_FILENAME} | cut -c1-32"`
   if [ "${ISO_MD5}" != "${ISO_HASH}" ]; then
     echo "ERROR: MD5 does not match. Got ${ISO_HASH} instead of ${ISO_MD5}. Aborting."
     exit 1
@@ -63,27 +63,15 @@ fi
 echo "Creating Custom ISO"
 if [ ! -e "${FOLDER_ISO}/custom.iso" ]; then
 
-  echo "Untarring downloaded ISO ..."
-  tar -C "${FOLDER_ISO_CUSTOM}" -xf "${ISO_FILENAME}"
-
-  # in osx lion 10.7.4, tar won't extract anything and will fail silently. If that happens, look for a newer version of bsd tar
-  if [ ! `ls $FOLDER_ISO_CUSTOM` ]; then
-      TAR_COMMAND=tar
-      if [ -x '/usr/local/bin/bsdtar' ];
-      then
-          LOCAL_BSD_TAR=/usr/local/bin/bsdtar
-      else
-          LOCAL_BSD_TAR=/usr/bin/bsdtar
-      fi
-      echo "Tar failed to extract ISO, falling back to $LOCAL_BSD_TAR"
-      "${LOCAL_BSD_TAR}" -C "${FOLDER_ISO_CUSTOM}" -xf "${ISO_FILENAME}"
-  fi
+  echo "Extracting ISO content ..."
+  7z x -o"${FOLDER_ISO_CUSTOM}" "${ISO_FILENAME}"
 
   # If that still didn't work, you have to update tar
-  if [ ! `ls -A $FOLDER_ISO_CUSTOM` ]; then
-    echo "Error with extracting the ISO file with your version of tar. Try updating to libarchive 3.0.4 (using e.g. the homebrew-dupes project)"
-    exit 1
-  fi
+  # FIXME: change check
+  #if [ ! `ls -A "$FOLDER_ISO_CUSTOM"` ]; then
+  #  echo "Error with extracting the ISO file."
+  #  exit 1
+  #fi
 
   # backup initrd.gz
   echo "Backing up current init.rd ..."
@@ -118,8 +106,8 @@ if [ ! -e "${FOLDER_ISO}/custom.iso" ]; then
   chmod u+w "${FOLDER_ISO_CUSTOM}"
   cp "${FOLDER_BASE}/late_command.sh" "${FOLDER_ISO_CUSTOM}"
 
-  echo "Running mkisofs ..."
-  mkisofs -r -V "Custom Debian Install CD" \
+  echo "Running genisoimage ..."
+  genisoimage -r -V "Custom Debian Install CD" \
     -cache-inodes -quiet \
     -J -l -b isolinux/isolinux.bin \
     -c isolinux/boot.cat -no-emul-boot \
