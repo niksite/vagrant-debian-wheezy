@@ -221,7 +221,7 @@ if ! VBoxManage showvminfo "${BOX}" >/dev/null 2>/dev/null; then
     --type dvddrive \
     --medium "${ISO_GUESTADDITIONS}"
 
-  VBoxHeadless --startvm "${BOX}"
+  VBoxHeadless --startvm "${BOX}" &
 
   # get private key
   echo "Install SSH private key"
