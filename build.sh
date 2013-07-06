@@ -56,7 +56,7 @@ if [ ! -e "${ISO_FILENAME}" ]; then
   curl --output "${ISO_FILENAME}" -L "${ISO_URL}"
 
   # make sure download is right...
-  ISO_HASH=`md5sum "${ISO_FILENAME} | cut -c1-32"`
+  ISO_HASH=`md5sum "${ISO_FILENAME}" | cut -c1-32`
   if [ "${ISO_MD5}" != "${ISO_HASH}" ]; then
     echo "ERROR: MD5 does not match. Got ${ISO_HASH} instead of ${ISO_MD5}. Aborting."
     exit 1
@@ -68,7 +68,7 @@ if [ ! -e "${ISO_GUESTADDITIONS}" ]; then
   curl --output "${ISO_GUESTADDITIONS}" -L "${ISO_GUESTADDITIONS_URL}"
 
   # make sure download is right...
-  ISO_GUESTADDITIONS_HASH=`md5sum "${ISO_GUESTADDITIONS} | cut -c1-32"`
+  ISO_GUESTADDITIONS_HASH=`md5sum "${ISO_GUESTADDITIONS}" | cut -c1-32`
   if [ "${ISO_GUESTADDITIONS_MD5}" != "${ISO_GUESTADDITIONS_HASH}" ]; then
     echo "ERROR: MD5 does not match. Got ${ISO_GUESTADDITIONS_HASH} instead of ${ISO_GUESTADDITIONS_MD5}. Aborting."
     exit 1
