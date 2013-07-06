@@ -202,6 +202,7 @@ if ! VBoxManage showvminfo "${BOX}" >/dev/null 2>/dev/null; then
   echo -n "Running system installation ..."
   VBoxHeadless --startvm "${BOX}" &
 
+  sleep 10
   echo -n "Waiting for installer to finish "
   while VBoxManage list runningvms | grep "${BOX}" >/dev/null; do
     sleep 20
